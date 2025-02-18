@@ -8,21 +8,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_app/main.dart';
 import 'package:my_app/screens/home_screen.dart';
+import 'package:my_app/providers/step_provider.dart';
 import 'mocks/pedometer_mock.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async {
+  setUpAll(() {
     // Set up SharedPreferences for testing
     SharedPreferences.setMockInitialValues({});
 
     // Mock platform channels
     const MethodChannel('plugins.flutter.io/shared_preferences')
       .setMockMethodCallHandler((MethodCall methodCall) async {
-        return {};
+        if (methodCall.method == 'getAll') {
+          return <String, dynamic>{};
+        }
+        return null;
     });
 
     // Mock orientation
@@ -43,7 +48,7 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     // Wait for the widget to rebuild and animations to complete
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(seconds: 1));
 
     // Verify that the app renders without crashing
     expect(find.byType(MaterialApp), findsOneWidget);

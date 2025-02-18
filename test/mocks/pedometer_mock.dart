@@ -7,18 +7,30 @@ class MockPedometer {
       .setMockMethodCallHandler((MethodCall methodCall) async {
         switch (methodCall.method) {
           case 'startListening':
-            return null;
+            return true;
           case 'stopListening':
-            return null;
+            return true;
+          case 'isStepCountAvailable':
+            return true;
           default:
             return null;
         }
     });
+
+    // Mock EventChannel for step updates
+    const EventChannel('step_count')
+      .setMockMethodCallHandler((MethodCall methodCall) async {
+        return null;
+    });
   }
 
   static Stream<StepCount> stepCountStream() {
-    return Stream.fromIterable([
-      StepCount(steps: 0, timeStamp: DateTime.now()),
-    ]);
+    return Stream.periodic(
+      const Duration(seconds: 1),
+      (count) => StepCount(
+        steps: count,
+        timeStamp: DateTime.now(),
+      ),
+    ).take(1); // Only emit one value for testing
   }
 }
