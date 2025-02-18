@@ -10,8 +10,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:my_app/main.dart';
 import 'package:my_app/providers/step_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'mocks/pedometer_mock.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    // Set up SharedPreferences for testing
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('Step Tracker app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
@@ -21,7 +30,10 @@ void main() {
       ),
     );
 
+    // Wait for the widget to rebuild
+    await tester.pumpAndSettle();
+
     // Verify that the app renders without crashing
-    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.byType(MyApp), findsOneWidget);
   });
 }
