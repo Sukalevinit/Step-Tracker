@@ -7,13 +7,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
 import 'package:my_app/main.dart';
+import 'package:my_app/providers/step_provider.dart';
 
 void main() {
   testWidgets('Step Tracker app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => StepProvider(),
+        child: const MyApp(),
+      ),
+    );
 
     // Verify that the app renders without crashing
     expect(find.byType(MaterialApp), findsOneWidget);
