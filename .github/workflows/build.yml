@@ -25,16 +25,19 @@ jobs:
         run: flutter clean
 
       - name: Build APK
+        id: build_apk
         run: |
           echo "Building APK..."
-          flutter build apk --split-per-abi --verbose --debug
+          flutter build apk --split-per-abi --verbose
 
       - name: Check build directory
+        if: success()
         run: |
           echo "Checking build output directories..."
           find build/app/outputs -type f -name "*.apk"
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-release
@@ -44,6 +47,7 @@ jobs:
             build/app/outputs/flutter-apk/*.apk
 
       - name: Print Environment Variables
+        if: success()
         run: |
           echo "Environment Variables:"
           printenv
