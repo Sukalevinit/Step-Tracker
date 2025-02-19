@@ -36,14 +36,24 @@ jobs:
         run: flutter test
         
       - name: Build APK
-        run: flutter build apk --release
-        
-      - name: List build directory
-        run: ls -R build/app/outputs/
+        run: |
+          flutter build apk --release
+          echo "Build completed, checking APK..."
+          
+      - name: Verify build output
+        run: |
+          if [ -d "build/app/outputs/flutter-apk" ]; then
+            echo "APK directory exists"
+            ls -l build/app/outputs/flutter-apk/
+          else
+            echo "APK directory not found"
+            ls -l build/app/outputs/
+            exit 1
+          fi
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 7
+          if-no-files-found: error
