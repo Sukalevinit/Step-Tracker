@@ -38,9 +38,13 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
         
-      - name: Upload APK
+      - name: List build directory
+        run: ls -R build/app/outputs/
+        
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: apk-file
+          path: |
+            build/app/outputs/flutter-apk/*.apk
           retention-days: 7
