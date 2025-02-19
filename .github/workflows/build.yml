@@ -61,10 +61,12 @@ jobs:
           printenv
 
       - name: Handle Build Errors and Notify
+        if: failure()
         run: |
-          if [ $? -eq 0 ]; then
-            echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Build succeeded!"
-          else
-            echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed during the APK build process! Please check the logs for details."
-            echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed! Please check the logs for details."
-          fi
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed during the APK build process! Please check the logs for details."
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed!"
+
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Build succeeded!"
