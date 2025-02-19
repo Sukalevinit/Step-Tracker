@@ -32,13 +32,18 @@ jobs:
         run: flutter pub get
         
       - name: Build APK
-        run: flutter build apk
-        
+        run: |
+          flutter clean
+          flutter build apk --split-per-abi
+          
+      - name: Check build directory
+        run: |
+          echo "Checking build output directories..."
+          find build/app/outputs -type f -name "*.apk"
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: |
-            build/app/outputs/apk/release/*.apk
-            build/app/outputs/bundle/release/*.aab
-            build/app/outputs/flutter-apk/*.apk
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
