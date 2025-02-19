@@ -82,7 +82,7 @@ jobs:
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Checking build output directories..."
           
-          if find build/app/outputs -type f -name "*.apk"; then
+          if ls build/app/outputs/apk/**/*.apk 2>/dev/null; then
             TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - APK files found."
           else
