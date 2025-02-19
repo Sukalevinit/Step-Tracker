@@ -20,27 +20,28 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo "Installing dependencies..."
+          echo "$(date) - Installing dependencies..."
           flutter pub get
 
       - name: Clean project
         run: |
-          echo "Cleaning project..."
+          echo "$(date) - Cleaning project..."
           flutter clean
 
       - name: Build APK
         id: build_apk
         run: |
-          echo "Building APK..."
+          echo "$(date) - Building APK..."
           for i in {1..3}; do 
             flutter build apk --split-per-abi --verbose && break || \
-            echo "Build failed, retrying..."; 
+            echo "$(date) - Build failed, retrying..."; 
+            sleep $((2 ** i)); 
           done
 
       - name: Check build directory
         if: success()
         run: |
-          echo "Checking build output directories..."
+          echo "$(date) - Checking build output directories..."
           find build/app/outputs -type f -name "*.apk"
 
       - name: Upload APK
@@ -56,20 +57,20 @@ jobs:
       - name: Print Environment Variables
         if: success()
         run: |
-          echo "Environment Variables:"
+          echo "$(date) - Environment Variables:"
           printenv
 
       - name: Handle Build Errors
         if: failure()
         run: |
-          echo "Build failed! Please check the logs for details."
+          echo "$(date) - Build failed! Please check the logs for details."
 
       - name: Notify on Success
         if: success()
         run: |
-          echo "Build succeeded!"
+          echo "$(date) - Build succeeded!"
 
       - name: Notify on Failure
         if: failure()
         run: |
-          echo "Build failed! Please check the logs for details."
+          echo "$(date) - Build failed! Please check the logs for details."
