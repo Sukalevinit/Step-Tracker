@@ -20,28 +20,40 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Installing dependencies..."
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [INFO] - Installing dependencies..."
           flutter pub get
 
       - name: Clean project
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Cleaning project..."
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [INFO] - Cleaning project..."
           flutter clean
 
       - name: Build APK
         id: build_apk
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Building APK..."
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [INFO] - Building APK..."
+          
           for i in {1..3}; do 
-            flutter build apk --split-per-abi --verbose && break || \
-            echo "$(date '+%Y-%m-%d %H:%M:%S') [WARNING] - Build failed, retrying..."; 
-            sleep $((2 ** i)); 
+            if flutter build apk --split-per-abi --verbose; then
+              echo "$TIMESTAMP [INFO] - Build completed successfully."
+              exit 0
+            else
+              echo "$TIMESTAMP [WARNING] - Build failed, retrying in $((2 ** i)) seconds..."
+              sleep $((2 ** i))
+            fi
           done
+          
+          echo "$TIMESTAMP [ERROR] - Build failed after multiple attempts!"
+          exit 1
 
       - name: Check build directory
         if: success()
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Checking build output directories..."
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [INFO] - Checking build output directories..."
           find build/app/outputs -type f -name "*.apk"
 
       - name: Upload APK
@@ -57,16 +69,18 @@ jobs:
       - name: Print Environment Variables
         if: success()
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Environment Variables:"
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [INFO] - Environment Variables:"
           printenv
 
       - name: Handle Build Errors and Notify
         if: failure()
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed during the APK build process! Please check the logs for details."
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed!"
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [ERROR] - Build failed during the APK build process! Please check the logs for details."
 
       - name: Notify on Success
         if: success()
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Build succeeded!"
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "$TIMESTAMP [INFO] - Build succeeded!"
