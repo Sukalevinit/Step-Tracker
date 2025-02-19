@@ -22,12 +22,9 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Installing dependencies..."
-          
           if flutter pub get; then
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - Dependencies installed successfully."
           else
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [ERROR] - Dependency installation failed!"
             exit 1
           fi
@@ -36,12 +33,9 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Cleaning project..."
-          
           if flutter clean; then
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - Clean successful."
           else
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [WARNING] - Clean operation failed, continuing..."
           fi
 
@@ -50,22 +44,19 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Starting APK build process..."
-
+          
           MAX_RETRIES=3
           RETRY_DELAY=2
-
+          
           for i in $(seq 1 $MAX_RETRIES); do
             TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - Build attempt $i..."
-
+            
             if flutter build apk --split-per-abi --verbose; then
-              TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
               echo "$TIMESTAMP [INFO] - Build completed successfully."
               exit 0
             else
-              TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
               echo "$TIMESTAMP [WARNING] - Build failed on attempt $i."
-              
               if [ $i -lt $MAX_RETRIES ]; then
                 echo "$TIMESTAMP [INFO] - Retrying in $((RETRY_DELAY ** i)) seconds..."
                 sleep $((RETRY_DELAY ** i))
@@ -82,12 +73,13 @@ jobs:
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Checking build output directories..."
           
-          if ls build/app/outputs/apk/**/*.apk 2>/dev/null; then
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-            echo "$TIMESTAMP [INFO] - APK files found."
+          APK_FILES=$(find build/app/outputs -type f \( -name "*.apk" -o -name "*.aab" \) 2>/dev/null)
+          
+          if [ -n "$APK_FILES" ]; then
+            echo "$TIMESTAMP [INFO] - APK/AAB files found:"
+            echo "$APK_FILES"
           else
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-            echo "$TIMESTAMP [ERROR] - No APK files found!"
+            echo "$TIMESTAMP [ERROR] - No APK/AAB files found!"
             exit 1
           fi
 
@@ -112,7 +104,7 @@ jobs:
         if: failure()
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "$TIMESTAMP [ERROR] - Build process failed. Please check logs for details."
+          echo "$TIMESTAMP [ERROR] - Build failed during the APK build process! Please check the logs for details."
 
       - name: Notify on Success
         if: success()
