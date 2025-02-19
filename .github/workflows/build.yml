@@ -24,8 +24,10 @@ jobs:
           echo "$TIMESTAMP [INFO] - Installing dependencies..."
           
           if flutter pub get; then
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - Dependencies installed successfully."
           else
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [ERROR] - Dependency installation failed!"
             exit 1
           fi
@@ -36,8 +38,10 @@ jobs:
           echo "$TIMESTAMP [INFO] - Cleaning project..."
           
           if flutter clean; then
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - Clean successful."
           else
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [WARNING] - Clean operation failed, continuing..."
           fi
 
@@ -46,16 +50,22 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Starting APK build process..."
-          
+
           MAX_RETRIES=3
           RETRY_DELAY=2
 
-          for i in $(seq 1 $MAX_RETRIES); do 
+          for i in $(seq 1 $MAX_RETRIES); do
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+            echo "$TIMESTAMP [INFO] - Build attempt $i..."
+
             if flutter build apk --split-per-abi --verbose; then
+              TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
               echo "$TIMESTAMP [INFO] - Build completed successfully."
               exit 0
             else
-              echo "$TIMESTAMP [WARNING] - Build attempt $i failed."
+              TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+              echo "$TIMESTAMP [WARNING] - Build failed on attempt $i."
+              
               if [ $i -lt $MAX_RETRIES ]; then
                 echo "$TIMESTAMP [INFO] - Retrying in $((RETRY_DELAY ** i)) seconds..."
                 sleep $((RETRY_DELAY ** i))
@@ -73,8 +83,10 @@ jobs:
           echo "$TIMESTAMP [INFO] - Checking build output directories..."
           
           if find build/app/outputs -type f -name "*.apk"; then
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [INFO] - APK files found."
           else
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
             echo "$TIMESTAMP [ERROR] - No APK files found!"
             exit 1
           fi
