@@ -22,42 +22,62 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Installing dependencies..."
-          flutter pub get
+          
+          if flutter pub get; then
+            echo "$TIMESTAMP [INFO] - Dependencies installed successfully."
+          else
+            echo "$TIMESTAMP [ERROR] - Dependency installation failed!"
+            exit 1
+          fi
 
       - name: Clean project
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Cleaning project..."
-          flutter clean
+          
+          if flutter clean; then
+            echo "$TIMESTAMP [INFO] - Clean successful."
+          else
+            echo "$TIMESTAMP [WARNING] - Clean operation failed, continuing..."
+          fi
 
       - name: Build APK
         id: build_apk
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "$TIMESTAMP [INFO] - Building APK..."
+          echo "$TIMESTAMP [INFO] - Starting APK build process..."
           
-          for i in {1..3}; do 
+          MAX_RETRIES=3
+          RETRY_DELAY=2
+
+          for i in $(seq 1 $MAX_RETRIES); do 
             if flutter build apk --split-per-abi --verbose; then
-              TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
               echo "$TIMESTAMP [INFO] - Build completed successfully."
               exit 0
             else
-              TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-              echo "$TIMESTAMP [WARNING] - Build failed, retrying in $((2 ** i)) seconds..."
-              sleep $((2 ** i))
+              echo "$TIMESTAMP [WARNING] - Build attempt $i failed."
+              if [ $i -lt $MAX_RETRIES ]; then
+                echo "$TIMESTAMP [INFO] - Retrying in $((RETRY_DELAY ** i)) seconds..."
+                sleep $((RETRY_DELAY ** i))
+              else
+                echo "$TIMESTAMP [ERROR] - Build failed after $MAX_RETRIES attempts!"
+                exit 1
+              fi
             fi
           done
-          
-          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "$TIMESTAMP [ERROR] - Build failed after multiple attempts!"
-          exit 1
 
       - name: Check build directory
         if: success()
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
           echo "$TIMESTAMP [INFO] - Checking build output directories..."
-          find build/app/outputs -type f -name "*.apk"
+          
+          if find build/app/outputs -type f -name "*.apk"; then
+            echo "$TIMESTAMP [INFO] - APK files found."
+          else
+            echo "$TIMESTAMP [ERROR] - No APK files found!"
+            exit 1
+          fi
 
       - name: Upload APK
         if: success()
@@ -73,14 +93,14 @@ jobs:
         if: success()
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "$TIMESTAMP [INFO] - Environment Variables:"
+          echo "$TIMESTAMP [INFO] - Printing environment variables..."
           printenv
 
       - name: Handle Build Errors and Notify
         if: failure()
         run: |
           TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "$TIMESTAMP [ERROR] - Build failed during the APK build process! Please check the logs for details."
+          echo "$TIMESTAMP [ERROR] - Build process failed. Please check logs for details."
 
       - name: Notify on Success
         if: success()
