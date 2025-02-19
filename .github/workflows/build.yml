@@ -63,7 +63,7 @@ jobs:
       - name: Handle Build Errors
         if: failure()
         run: |
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed! Please check the logs for details."
+          echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed during the APK build process! Please check the logs for details."
 
       - name: Notify on Success
         if: success()
