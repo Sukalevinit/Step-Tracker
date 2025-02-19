@@ -26,7 +26,8 @@ jobs:
 
       - name: Build APK
         run: |
-          flutter build apk --split-per-abi
+          echo "Building APK..."
+          flutter build apk --split-per-abi --verbose --debug
 
       - name: Check build directory
         run: |
@@ -42,3 +43,12 @@ jobs:
             build/app/outputs/bundle/release/*.aab
             build/app/outputs/flutter-apk/*.apk
 
+      - name: Print Environment Variables
+        run: |
+          echo "Environment Variables:"
+          printenv
+
+      - name: Handle Build Errors
+        if: failure()
+        run: |
+          echo "Build failed! Please check the logs for details."
