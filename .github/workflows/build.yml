@@ -65,7 +65,6 @@ jobs:
         run: |
           echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed during the APK build process! Please check the logs for details."
           echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] - Build failed!"
-          echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] - Build failed!"
 
       - name: Notify on Success
         if: success()
