@@ -56,3 +56,13 @@ jobs:
         if: failure()
         run: |
           echo "Build failed! Please check the logs for details."
+
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "Build succeeded!"
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "Build failed! Please check the logs for details."
