@@ -19,16 +19,23 @@ jobs:
           flutter-version: 'latest'
 
       - name: Install dependencies
-        run: flutter pub get
+        run: |
+          echo "Installing dependencies..."
+          flutter pub get
 
       - name: Clean project
-        run: flutter clean
+        run: |
+          echo "Cleaning project..."
+          flutter clean
 
       - name: Build APK
         id: build_apk
         run: |
           echo "Building APK..."
-          flutter build apk --split-per-abi --verbose
+          for i in {1..3}; do 
+            flutter build apk --split-per-abi --verbose && break || \
+            echo "Build failed, retrying..."; 
+          done
 
       - name: Check build directory
         if: success()
